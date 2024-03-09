@@ -1,9 +1,11 @@
-use std::fs::File;
+mod test;
+
 use rand::Rng;
-use std::io::Write;
-use std::io::Result;
-use std::{fs, io};
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::Result;
+use std::io::Write;
+use std::{fs, io};
 
 fn read_plain_text(file_path: &str) -> Result<String> {
     fs::read_to_string(file_path)
@@ -29,9 +31,7 @@ fn encrypt_file(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -
     let dictionary_map = read_dictionary_to_map(dictionary_path)?;
 
     let plain_text = fs::read_to_string(plain_path)?;
-    let filtered_text: String = plain_text.chars()
-        .filter(|c| c.is_alphabetic())
-        .collect();
+    let filtered_text: String = plain_text.chars().filter(|c| c.is_alphabetic()).collect();
 
     let mut encrypted_text = String::new();
 
@@ -40,32 +40,35 @@ fn encrypt_file(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -
         if let Some(&encrypted_char) = dictionary_map.get(&c) {
             encrypted_text.push(encrypted_char);
         } else {
-            encrypted_text.push(c); // Keep the character as is if not found in dictionary
+            encrypted_text.push(c);
         }
     }
-
     fs::write(encrypted_path, encrypted_text)?;
     Ok(())
 }
-fn generate_key_map() -> Result<()>{
-    let mut file = File::create("src/resource/dictionary.txt")?;
+
+fn generate_key_map() -> Result<()> {
+    let mut file = File::create(DICTIONARY_PATH)?;
     for i in 65u8..90 {
         let letter = i as char;
         let mut rng = rand::thread_rng();
         let key: char = rng.gen_range('A'..='Z');
         let result = format!("{}\t{}\n", letter, key);
-        write!(file,"{}", result)?;
+        write!(file, "{}", result)?;
     }
     Ok(())
 }
 
+const PLAIN_TEXT_PATH: &'static str = "src/resource/plain.txt";
+const DICTIONARY_PATH: &'static str = "src/resource/dictionary.txt";
+const ENCRYPTED_PATH: &'static str = "src/resource/encrypted.txt";
+
 fn main() {
     println!("Hello, world!");
-    generate_key_map().expect("TODO: panic message");
-    let plain_path = "src/resource/plain.txt";
-    let dictionary_path = "src/resource/dictionary.txt";
-    let encrypted_path = "src/resource/encrypted.txt";
-
+    // generate_key_map().expect("TODO: panic message");
+    let plain_path = PLAIN_TEXT_PATH;
+    let dictionary_path = DICTIONARY_PATH;
+    let encrypted_path = ENCRYPTED_PATH;
 
     if let Err(e) = encrypt_file(plain_path, encrypted_path, dictionary_path) {
         eprintln!("Error encrypting file: {}", e);
