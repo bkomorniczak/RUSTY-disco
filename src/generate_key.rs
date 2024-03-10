@@ -1,6 +1,6 @@
-use std::io;
-use std::fs::File;
 use rand::Rng;
+use std::fs::File;
+use std::io;
 use std::io::Write;
 
 fn generate_key_map() -> io::Result<()> {
