@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod tests {
-    use crate::read_dictionary_to_map;
+    use std::fs;
+    use crate::{encrypt_file, read_dictionary_to_map};
 
     #[test]
     fn test_read_dictionary_to_map() {
@@ -10,6 +11,18 @@ mod tests {
         assert_eq!(dictionary_map.get(&'A'), Some(&'U')); // Assuming 'A' maps to 'B' in your test dictionary
         assert!(dictionary_map.len() > 0, "Dictionary should not be empty");
     }
+
+    #[test]
+    fn test_file_encryption() {
+        let result = encrypt_file("src/resource/test_plain.txt", "src/resource/test_encrypted.txt", "src/resource/dictionary.txt");
+        let content1 = fs::read_to_string("src/resource/test_encrypted.txt")
+            .expect("Failed to read the first file");
+        let content2 = fs::read_to_string("src/resource/test_should_result.txt")
+            .expect("Failed to read the second file");
+
+        assert_eq!(content1,content2,"No match");
+    }
+
 
 
 }
