@@ -1,11 +1,10 @@
 mod test;
+mod generate_key;
 
-use rand::Rng;
 use std::collections::HashMap;
-use std::fs::File;
 use std::io::Result;
-use std::io::Write;
 use std::{fs, io};
+use clap::{App, Arg};
 
 fn read_plain_text(file_path: &str) -> Result<String> {
     fs::read_to_string(file_path)
@@ -47,28 +46,37 @@ fn encrypt_file(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -
     Ok(())
 }
 
-fn generate_key_map() -> Result<()> {
-    let mut file = File::create(DICTIONARY_PATH)?;
-    for i in 65u8..90 {
-        let letter = i as char;
-        let mut rng = rand::thread_rng();
-        let key: char = rng.gen_range('A'..='Z');
-        let result = format!("{}\t{}\n", letter, key);
-        write!(file, "{}", result)?;
-    }
-    Ok(())
-}
-
-const PLAIN_TEXT_PATH: &'static str = "src/resource/plain.txt";
-const DICTIONARY_PATH: &'static str = "src/resource/dictionary.txt";
-const ENCRYPTED_PATH: &'static str = "src/resource/encrypted.txt";
-
 fn main() {
-    println!("Hello, world!");
-    // generate_key_map().expect("TODO: panic message");
-    let plain_path = PLAIN_TEXT_PATH;
-    let dictionary_path = DICTIONARY_PATH;
-    let encrypted_path = ENCRYPTED_PATH;
+    let matches = App::new("File Encryptor")
+        .version("1.0")
+        .author("Komob")
+        .about("Encrypts a file using a provided dictionary")
+        .arg(Arg::with_name("input")
+            .short('i')
+            .long("input")
+            .value_name("FILE")
+            .help("Sets the input plaintext file")
+            .takes_value(true)
+            .required(true))
+        .arg(Arg::with_name("output")
+            .short('o')
+            .long("output")
+            .value_name("FILE")
+            .help("Sets the output encrypted file")
+            .takes_value(true)
+            .required(true))
+        .arg(Arg::with_name("key")
+            .short('k')
+            .long("key")
+            .value_name("FILE")
+            .help("Sets the encryption key (dictionary) file")
+            .takes_value(true)
+            .required(true))
+        .get_matches();
+
+    let plain_path = matches.value_of("input").unwrap();
+    let encrypted_path = matches.value_of("output").unwrap();
+    let dictionary_path = matches.value_of("key").unwrap();
 
     if let Err(e) = encrypt_file(plain_path, encrypted_path, dictionary_path) {
         eprintln!("Error encrypting file: {}", e);
