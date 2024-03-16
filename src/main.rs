@@ -21,6 +21,22 @@ fn count_monograms(text: &str) -> Vec<(char, u32)> {
     counts_vec
 }
 
+fn count_bigrams(text: &str) -> Vec<((char, char), u32)> {
+    let mut counts = HashMap::new();
+    let mut chars = text.chars().filter(|c| c.is_alphabetic()).collect::<Vec<_>>();
+
+    chars = chars.iter().map(|c| c.to_uppercase().next().unwrap()).collect();
+    for window in chars.windows(2) {
+        if let [a,b] = &window[..] {
+            *counts.entry((*a, *b)).or_insert(0) +=1;
+        }
+    }
+
+    let mut count_vec: Vec<((char,char), u32)> = counts.into_iter().collect();
+    count_vec.sort_by(|a,b| b.1.cmp(&a.1));
+    count_vec
+}
+
 fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()> {
     let mut file = File::create(filename)?;
     for (letter, count) in counts.iter() {
@@ -29,7 +45,7 @@ fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()
     Ok(())
 }
 
-fn main()-> io::Result<()> {
+fn main() -> io::Result<()> {
     let matches = App::new("File Encryptor")
         .version("1.0")
         .author("Komob")
@@ -88,5 +104,4 @@ fn main()-> io::Result<()> {
         println!("Monogram counts saved to {}", filename);
     }
     Ok(())
-
 }
