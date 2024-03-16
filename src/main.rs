@@ -45,6 +45,25 @@ fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()
     Ok(())
 }
 
+fn save_bigram_counts(filename: &str, counts: &[((char, char), u32)]) -> io::Result<()> {
+    let mut file = File::create(filename)?;
+    for ((a,b), count) in counts.iter() {
+        writeln!(file, "{}{}\t{}", a, b, count)?;
+    }
+    Ok(())
+}
+fn handle_encryption(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -> io::Result<()> {
+    match encrypt::encrypt_file(plain_path, encrypted_path, dictionary_path) {
+        Err(e) => {
+            eprintln!("Error encrypting file: {}", e);
+            Err(e)
+        },
+        Ok(_) => {
+            println!("File encrypted successfully.");
+            Ok(())
+        }
+    }
+}
 fn main() -> io::Result<()> {
     let matches = App::new("File Encryptor")
         .version("1.0")
@@ -84,17 +103,21 @@ fn main() -> io::Result<()> {
                 .help("Saves monogram counts to a file")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("g2")
+                .long("g2")
+                .value_name("FILE")
+                .help("Saves bigram counts to a file")
+                .takes_value(true),
+        )
         .get_matches();
 
     let plain_path = matches.value_of("input").unwrap_or_default();
     let encrypted_path = matches.value_of("output").unwrap_or_default();
     let dictionary_path = matches.value_of("key").unwrap_or_default();
 
-    if let Err(e) = encrypt::encrypt_file(plain_path, encrypted_path, dictionary_path) {
-        eprintln!("Error encrypting file: {}", e);
-    } else {
-        println!("File encrypted successfully.");
-    }
+    handle_encryption(plain_path, encrypted_path, dictionary_path)?;
+
     let text = fs::read_to_string(plain_path)?;
 
     let monogram_counts = count_monograms(&text);
@@ -102,6 +125,12 @@ fn main() -> io::Result<()> {
     if let Some(filename) = matches.value_of("g1") {
         save_monogram_counts(filename, &monogram_counts)?;
         println!("Monogram counts saved to {}", filename);
+    }
+
+    let bigram_counts = count_bigrams(&text);
+    if let Some(filename) = matches.value_of("g2") {
+        save_bigram_counts(filename, &bigram_counts)?;
+        println!("Bigram counts saved to {}", filename);
     }
     Ok(())
 }
