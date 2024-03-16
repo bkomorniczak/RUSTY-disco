@@ -37,6 +37,34 @@ fn count_bigrams(text: &str) -> Vec<((char, char), u32)> {
     count_vec
 }
 
+fn quadgram_counts(text: &str) -> Vec<((char, char, char, char), u32)> {
+    let mut counts = HashMap::new();
+    let mut chars = text.chars().filter(|c| c.is_alphabetic()).collect::<Vec<_>>();
+        chars = chars.iter().map(|c| c.to_uppercase().next().unwrap()).collect();
+    for window in chars.windows(4) {
+        if let [a,b,c,d] = &window[..] {
+            *counts.entry((*a, *b, *c, *d)).or_insert(0) += 1;
+        }
+    }
+    let mut count_vec: Vec<((char,char,char,char), u32)> = counts.into_iter().collect();
+    count_vec.sort_by(|a,b| b.1.cmp(&a.1));
+    count_vec
+}
+
+fn trigram_counts(text: &str) -> Vec<((char, char, char), u32)>{
+    let mut counts = HashMap::new();
+    let mut chars = text.chars().filter(|c| c.is_alphabetic()).collect::<Vec<_>>();
+    chars = chars.iter().map(|c| c.to_uppercase().next().unwrap()).collect();
+    for window in chars.windows(3) {
+        if let [a,b,c] = &window[..] {
+            *counts.entry((*a, *b, *c)).or_insert(0) += 1;
+        }
+    }
+    let mut count_vec: Vec<((char,char,char), u32)> = counts.into_iter().collect();
+    count_vec.sort_by(|a,b| b.1.cmp(&a.1));
+    count_vec
+}
+
 fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()> {
     let mut file = File::create(filename)?;
     for (letter, count) in counts.iter() {
@@ -48,6 +76,21 @@ fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()
 fn save_bigram_counts(filename: &str, counts: &[((char, char), u32)]) -> io::Result<()> {
     let mut file = File::create(filename)?;
     for ((a,b), count) in counts.iter() {
+        writeln!(file, "{}{}\t{}", a, b, count)?;
+    }
+    Ok(())
+}
+fn save_trigram_counts(filename: &str, counts: &[((char, char, char), u32)]) -> io::Result<()> {
+    let mut file = File::create(filename)?;
+    for ((a,b,c), count) in counts.iter() {
+        writeln!(file, "{}{}\t{}", a, b, count)?;
+    }
+    Ok(())
+}
+
+fn save_quadgram_counts(filename: &str, counts: &[((char, char, char, char), u32)]) -> io::Result<()> {
+    let mut file = File::create(filename)?;
+    for ((a,b,c,d), count) in counts.iter() {
         writeln!(file, "{}{}\t{}", a, b, count)?;
     }
     Ok(())
@@ -110,6 +153,20 @@ fn main() -> io::Result<()> {
                 .help("Saves bigram counts to a file")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("g3")
+                .long("g3")
+                .value_name("FILE")
+                .help("Saves trigram counts to a file")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("g4")
+                .long("g4")
+                .value_name("FILE")
+                .help("Saves quadgram counts to a file")
+                .takes_value(true),
+        )
         .get_matches();
 
     let plain_path = matches.value_of("input").unwrap_or_default();
@@ -131,6 +188,16 @@ fn main() -> io::Result<()> {
     if let Some(filename) = matches.value_of("g2") {
         save_bigram_counts(filename, &bigram_counts)?;
         println!("Bigram counts saved to {}", filename);
+    }
+    let trigram_counts = count_bigrams(&text);
+    if let Some(filename) = matches.value_of("g3") {
+        save_trigram_counts(filename, &trigram_counts)?;
+        println!("Trigram counts saved to {}", filename);
+    }
+    let quadgram_counts = count_bigrams(&text);
+    if let Some(filename) = matches.value_of("g4") {
+        save_quadgram_counts(filename, &quadgram_counts)?;
+        println!("Quadgram counts saved to {}", filename);
     }
     Ok(())
 }
