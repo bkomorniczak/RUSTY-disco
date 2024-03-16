@@ -6,7 +6,7 @@ use clap::{App, Arg};
 use std::collections::HashMap;
 use std::fs::File;
 use std::{fs, io};
-use std::io::Write;
+use std::io::{BufRead, BufReader, Write};
 
 
 fn count_ngrams(text: &str, n: usize) -> Vec<(String, u32)> {
@@ -30,6 +30,43 @@ fn save_ngram_counts(filename: &str, counts: &[(String, u32)]) -> io::Result<()>
     for (ngram, count) in counts.iter() {
         writeln!(file, "{}\t{}", ngram, count)?;
     }
+    Ok(())
+}
+fn sum_values_in_file(filename: &str) -> io::Result<u32> {
+    let file = File::open(filename)?;
+    let reader = BufReader::new(file);
+
+    let mut sum = 0;
+    for line in reader.lines() {
+        let line = line?;
+        let parts: Vec<&str> = line.split_whitespace().collect();
+        if parts.len() >= 2 {
+            if let Ok(value) = parts[1].parse::<u32>() {
+                sum += value;
+            }
+        }
+    }
+
+    Ok(sum)
+}
+fn calculate_and_save_ngram_probability(inputfile: &str, outputfile: &str) -> io::Result<()> {
+    let total_count = sum_values_in_file(inputfile)?;
+    let inputfile = File::open(inputfile)?;
+    let reader = BufReader::new(inputfile);
+    let mut outputfile = File::create(outputfile)?;
+
+    for line in reader.lines() {
+        let line = line?;
+        let parts: Vec<&str> = line.split_whitespace().collect();
+
+        if parts.len()>=2 {
+            if let Ok(value) = parts[1].parse::<u32>() {
+                let probability = value as f64 / total_count as f64;
+                writeln!(outputfile, "{}\t{:.10}", parts[0], probability)?;
+            }
+        }
+    }
+
     Ok(())
 }
 fn handle_encryption(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -> io::Result<()> {
@@ -121,6 +158,9 @@ fn main() -> io::Result<()> {
             println!("{}-gram counts saved to {}", n, filename);
         }
     }
-
+    calculate_and_save_ngram_probability("src/resource/monogram.txt", "src/resource/monogram_probabilities.txt")?;
+    calculate_and_save_ngram_probability("src/resource/bigram.txt", "src/resource/bigram_probabilities.txt")?;
+    calculate_and_save_ngram_probability("src/resource/trigram.txt", "src/resource/trigram_probabilities.txt")?;
+    calculate_and_save_ngram_probability("src/resource/quadgram.txt", "src/resource/quadgram_probabilities.txt")?;
     Ok(())
 }

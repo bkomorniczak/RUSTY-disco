@@ -1,9 +1,9 @@
 use std::{fs, io};
 use std::collections::HashMap;
 
-fn read_plain_text(file_path: &str) -> io::Result<String> {
-    fs::read_to_string(file_path)
-}
+// fn read_plain_text(file_path: &str) -> io::Result<String> {
+//     fs::read_to_string(file_path)
+// }
 
 pub fn read_dictionary_to_map(dictionary_path: &str) -> io::Result<HashMap<char, char>> {
     let mut map = HashMap::new();
