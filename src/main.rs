@@ -8,47 +8,27 @@ use std::fs::File;
 use std::{fs, io};
 use std::io::Write;
 
-fn count_monograms(text: &str) -> Vec<(char, u32)> {
-    let mut counts = HashMap::new();
-    for c in text.chars() {
-        if c.is_alphabetic() {
-            *counts.entry(c.to_uppercase().next().unwrap()).or_insert(0) += 1;
-        }
-    }
-    let mut counts_vec: Vec<(char, u32)> = counts.into_iter().collect();
-    counts_vec.sort_by(|a, b| b.1.cmp(&a.1));
 
+fn count_ngrams(text: &str, n: usize) -> Vec<(String, u32)> {
+    let mut counts = HashMap::new();
+    let chars = text.chars()
+        .filter(|c| c.is_alphabetic())
+        .map(|c| c.to_uppercase().next().unwrap())
+        .collect::<Vec<_>>();
+
+    for window in chars.windows(n) {
+        let ngram = window.iter().collect::<String>();
+        *counts.entry(ngram).or_insert(0) += 1;
+    }
+
+    let mut counts_vec: Vec<(String, u32)> = counts.into_iter().collect();
+    counts_vec.sort_by(|a, b| b.1.cmp(&a.1));
     counts_vec
 }
-
-fn count_bigrams(text: &str) -> Vec<((char, char), u32)> {
-    let mut counts = HashMap::new();
-    let mut chars = text.chars().filter(|c| c.is_alphabetic()).collect::<Vec<_>>();
-
-    chars = chars.iter().map(|c| c.to_uppercase().next().unwrap()).collect();
-    for window in chars.windows(2) {
-        if let [a,b] = &window[..] {
-            *counts.entry((*a, *b)).or_insert(0) +=1;
-        }
-    }
-
-    let mut count_vec: Vec<((char,char), u32)> = counts.into_iter().collect();
-    count_vec.sort_by(|a,b| b.1.cmp(&a.1));
-    count_vec
-}
-
-fn save_monogram_counts(filename: &str, counts: &[(char, u32)]) -> io::Result<()> {
+fn save_ngram_counts(filename: &str, counts: &[(String, u32)]) -> io::Result<()> {
     let mut file = File::create(filename)?;
-    for (letter, count) in counts.iter() {
-        writeln!(file, "{}\t{}", letter, count)?;
-    }
-    Ok(())
-}
-
-fn save_bigram_counts(filename: &str, counts: &[((char, char), u32)]) -> io::Result<()> {
-    let mut file = File::create(filename)?;
-    for ((a,b), count) in counts.iter() {
-        writeln!(file, "{}{}\t{}", a, b, count)?;
+    for (ngram, count) in counts.iter() {
+        writeln!(file, "{}\t{}", ngram, count)?;
     }
     Ok(())
 }
@@ -110,6 +90,20 @@ fn main() -> io::Result<()> {
                 .help("Saves bigram counts to a file")
                 .takes_value(true),
         )
+        .arg(
+            Arg::with_name("g3")
+                .long("g3")
+                .value_name("FILE")
+                .help("Saves trigram counts to a file")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("g4")
+                .long("g4")
+                .value_name("FILE")
+                .help("Saves quadgram counts to a file")
+                .takes_value(true),
+        )
         .get_matches();
 
     let plain_path = matches.value_of("input").unwrap_or_default();
@@ -120,17 +114,13 @@ fn main() -> io::Result<()> {
 
     let text = fs::read_to_string(plain_path)?;
 
-    let monogram_counts = count_monograms(&text);
-
-    if let Some(filename) = matches.value_of("g1") {
-        save_monogram_counts(filename, &monogram_counts)?;
-        println!("Monogram counts saved to {}", filename);
+    for n in 1..=4 {
+        if let Some(filename) = matches.value_of(&format!("g{}", n)) {
+            let ngram_counts = count_ngrams(&text, n);
+            save_ngram_counts(filename, &ngram_counts)?;
+            println!("{}-gram counts saved to {}", n, filename);
+        }
     }
 
-    let bigram_counts = count_bigrams(&text);
-    if let Some(filename) = matches.value_of("g2") {
-        save_bigram_counts(filename, &bigram_counts)?;
-        println!("Bigram counts saved to {}", filename);
-    }
     Ok(())
 }
