@@ -49,11 +49,11 @@ fn sum_values_in_file(filename: &str) -> io::Result<u32> {
 
     Ok(sum)
 }
-fn calculate_and_save_ngram_probability(inputfile: &str, outputfile: &str) -> io::Result<()> {
-    let total_count = sum_values_in_file(inputfile)?;
-    let inputfile = File::open(inputfile)?;
+fn calculate_and_save_ngram_probability(input_file: &str, output_file: &str) -> io::Result<()> {
+    let total_count = sum_values_in_file(input_file)?;
+    let inputfile = File::open(input_file)?;
     let reader = BufReader::new(inputfile);
-    let mut outputfile = File::create(outputfile)?;
+    let mut outputfile = File::create(output_file)?;
 
     for line in reader.lines() {
         let line = line?;
@@ -141,6 +141,16 @@ fn main() -> io::Result<()> {
                 .help("Saves quadgram counts to a file")
                 .takes_value(true),
         )
+        .arg(Arg::new("ri")
+            .long("ri")
+            .value_name("FILE")
+            .help("Sets the input file for n-gram ratio calculation")
+            .takes_value(true))
+        .arg(Arg::new("rogit ")
+            .long("ro")
+            .value_name("FILE")
+            .help("Sets the output file for n-gram ratio calculation results")
+            .takes_value(true))
         .get_matches();
 
     let plain_path = matches.value_of("input").unwrap_or_default();
@@ -158,9 +168,12 @@ fn main() -> io::Result<()> {
             println!("{}-gram counts saved to {}", n, filename);
         }
     }
-    calculate_and_save_ngram_probability("src/resource/monogram.txt", "src/resource/monogram_probabilities.txt")?;
-    calculate_and_save_ngram_probability("src/resource/bigram.txt", "src/resource/bigram_probabilities.txt")?;
-    calculate_and_save_ngram_probability("src/resource/trigram.txt", "src/resource/trigram_probabilities.txt")?;
-    calculate_and_save_ngram_probability("src/resource/quadgram.txt", "src/resource/quadgram_probabilities.txt")?;
+    if matches.is_present("ri") && matches.is_present("ro") {
+        let input_filename = matches.value_of("ri")
+            .expect("Missing input filename for ratio calculation");
+        let output_filename = matches.value_of("ro")
+            .expect("Missing output filename for ratio calculation");
+        calculate_and_save_ngram_probability(input_filename, output_filename)?;
+    }
     Ok(())
 }
