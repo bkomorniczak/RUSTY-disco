@@ -8,7 +8,6 @@ use std::fs::File;
 use std::{fs, io};
 use std::io::{BufRead, BufReader, Write};
 
-
 fn count_ngrams(text: &str, n: u32) -> Vec<(String, u32)> {
     let mut counts = HashMap::new();
     let chars = text.chars()
