@@ -90,7 +90,6 @@ fn main() -> io::Result<()> {
             Arg::with_name("input")
                 .short('i')
                 .long("input")
-                .value_name("FILE")
                 .help("Sets the input plaintext file")
                 .takes_value(true)
                 .required(true),
@@ -99,7 +98,6 @@ fn main() -> io::Result<()> {
             Arg::with_name("output")
                 .short('o')
                 .long("output")
-                .value_name("FILE")
                 .help("Sets the output encrypted file")
                 .takes_value(true)
                 .required(true),
@@ -141,12 +139,12 @@ fn main() -> io::Result<()> {
                 .help("Saves quadgram counts to a file")
                 .takes_value(true),
         )
-        .arg(Arg::new("ri")
+        .arg(Arg::with_name("ri")
             .long("ri")
             .value_name("FILE")
             .help("Sets the input file for n-gram ratio calculation")
             .takes_value(true))
-        .arg(Arg::new("rogit ")
+        .arg(Arg::with_name("ro")
             .long("ro")
             .value_name("FILE")
             .help("Sets the output file for n-gram ratio calculation results")
