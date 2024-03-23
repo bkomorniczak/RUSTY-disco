@@ -1,4 +1,34 @@
 # Opis projektu
+
+## Glowne funkcje programu
+Program pozwala na szyfrowanie i deszyfrowanie tekstu przy użyciu szyfru podstawieniowego. Program pozwala na obliczenie monogramów, bigramów, trigramów, quadgramów oraz prawdopodobieństw ich wystąpienia w tekście. Program pozwala na obliczenie wartości T dla każdego z ngramów.
+
+### Funkcja main
+Funkcja main odpowiada za obsługę argumentów programu oraz wywołanie odpowiednich funkcji. 
+Główne elementy funkcji main:
+- Wczytanie argumentów programu. Wczytywanie komend z argumentów programu odbywa się przy użyciu biblioteki clap. Używane są następujące flagi:
+  - -i - ścieżka do pliku z tekstem wejściowym
+  - -o - ścieżka do pliku z tekstem wyjściowym
+  - -k - ścieżka do pliku z kluczem
+  - --g1 - ścieżka do pliku z monogramami
+  - --g2 - ścieżka do pliku z bigramami
+  - --g3 - ścieżka do pliku z trigramami
+  - --g4 - ścieżka do pliku z quadgramami
+  - --ri - ścieżka do pliku referencyjnego z ngramami
+  - --ro - ścieżka do pliku referencyjnego z prawdopodobieństwami ngramów
+  - --p - ścieżka do pliku z prawdopodobieństwami ngramów
+  - --t1 - flaga oznaczająca obliczenie wartości T dla monogramów
+  - --t2 - flaga oznaczająca obliczenie wartości T dla bigramów
+  - --t3 - flaga oznaczająca obliczenie wartości T dla trigramów
+  - --t4 - flaga oznaczająca obliczenie wartości T dla quadgramów
+- Wczytanie tekstu z pliku
+- Wczytanie klucza z pliku
+- Wczytanie ngramów z pliku
+- Wczytanie prawdopodobieństw ngramów z pliku
+- Wywołanie odpowiednich funkcji w zależności od argumentów programu
+- Zapisanie wyników do pliku
+- Wypisanie wyników na ekran
+
 ## Komendy
 
 ### Szyfruj
