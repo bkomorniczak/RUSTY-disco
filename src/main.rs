@@ -1,6 +1,5 @@
 mod encrypt;
 mod generate_key;
-mod test;
 
 use clap::{App, Arg};
 use std::collections::HashMap;
@@ -8,13 +7,25 @@ use std::fs::File;
 use std::{fs, io};
 use std::io::{BufRead, BufReader, Write};
 
+fn handle_encryption(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -> io::Result<()> {
+    match encrypt::encrypt_file(plain_path, encrypted_path, dictionary_path) {
+        Err(e) => {
+            eprintln!("Error encrypting file: {}", e);
+            Err(e)
+        },
+        Ok(_) => {
+            println!("File encrypted successfully.");
+            Ok(())
+        }
+    }
+}
+
 fn count_ngrams(text: &str, n: u32) -> Vec<(String, u32)> {
     let mut counts = HashMap::new();
     let chars = text.chars()
         .filter(|c| c.is_alphabetic())
         .map(|c| c.to_uppercase().next().unwrap())
         .collect::<Vec<_>>();
-
     for window in chars.windows(n as usize) {
         let ngram = window.iter().collect::<String>();
         *counts.entry(ngram).or_insert(0) += 1;
@@ -27,7 +38,7 @@ fn count_ngrams(text: &str, n: u32) -> Vec<(String, u32)> {
 fn save_ngram_counts(filename: &str, counts: &[(String, u32)]) -> io::Result<()> {
     let mut file = File::create(filename)?;
     for (ngram, count) in counts.iter() {
-        writeln!(file, "{}\t{}", ngram, count)?;
+        writeln!(file, "{} {}", ngram, count)?;
     }
     Ok(())
 }
@@ -61,28 +72,15 @@ fn calculate_and_save_ngram_probability(input_file: &str, output_file: &str) -> 
         if parts.len()>=2 {
             if let Ok(value) = parts[1].parse::<u32>() {
                 let probability = value as f64 / total_count as f64;
-                writeln!(outputfile, "{}\t{:.10}", parts[0], probability)?;
+                writeln!(outputfile, "{} {:.10}", parts[0], probability)?;
             }
         }
     }
 
     Ok(())
 }
-fn handle_encryption(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -> io::Result<()> {
-    match encrypt::encrypt_file(plain_path, encrypted_path, dictionary_path) {
-        Err(e) => {
-            eprintln!("Error encrypting file: {}", e);
-            Err(e)
-        },
-        Ok(_) => {
-            println!("File encrypted successfully.");
-            Ok(())
-        }
-    }
-}
 fn calculate_t(n_grams: &HashMap<String, u32>, total_ngrams: u32, probabilities: &HashMap<String, f64>) -> f64 {
     let mut t = 0.0;
-    println!("Counting T!");
     for (n_gram, &count) in n_grams {
         if let Some(&probability) = probabilities.get(n_gram) {
             let expected_count = total_ngrams as f64 * probability;
@@ -100,7 +98,7 @@ fn read_probabilities(filename: &str) -> io::Result<HashMap<String, f64>> {
 
     for line in reader.lines() {
         let line = line?;
-        let parts: Vec<&str> = line.split('\t').collect();
+        let parts: Vec<&str> = line.split(' ').collect();
         if parts.len() == 2 {
             if let Ok(prob) = parts[1].parse::<f64>() {
                 probabilities.insert(parts[0].to_string(), prob);
@@ -116,7 +114,7 @@ fn main() -> io::Result<()> {
     let matches = App::new("File Encryptor")
         .version("1.0")
         .author("Komob")
-        .about("Lab1 Kryptografia")
+        .about("Lab1 KK")
         .arg(
             Arg::with_name("input")
                 .short('i')
@@ -183,9 +181,21 @@ fn main() -> io::Result<()> {
                 .value_name("PROB_FILE")
                 .help("Sets the file containing n-gram probabilities")
                 .takes_value(true)
-                .required_if("compute_t", "true"))
-        .arg(Arg::with_name("compute_t")
-            .long("t")
+        )
+        .arg(Arg::with_name("t1")
+            .long("t1")
+            .help("Compute the T statistic for n-grams")
+            .takes_value(false))
+        .arg(Arg::with_name("t2")
+            .long("t2")
+            .help("Compute the T statistic for n-grams")
+            .takes_value(false))
+        .arg(Arg::with_name("t3")
+            .long("t3")
+            .help("Compute the T statistic for n-grams")
+            .takes_value(false))
+        .arg(Arg::with_name("t4")
+            .long("t4")
             .help("Compute the T statistic for n-grams")
             .takes_value(false))
         .get_matches();
@@ -212,10 +222,9 @@ fn main() -> io::Result<()> {
             .expect("Missing output filename for ratio calculation");
         calculate_and_save_ngram_probability(input_filename, output_filename)?;
     }
-    if matches.is_present("compute_t") {
+    if matches.is_present("t1") {
         let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
         let probabilities = read_probabilities(probabilities_file)?;
-
         let n_gram_size: u32= 1;
         let n_gram_counts = count_ngrams(&text, n_gram_size);
         let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
@@ -223,6 +232,36 @@ fn main() -> io::Result<()> {
 
         println!("Computed T value: {}", t_value);
     }
+    if matches.is_present("t2") {
+        let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
+        let probabilities = read_probabilities(probabilities_file)?;
+        let n_gram_size: u32= 2;
+        let n_gram_counts = count_ngrams(&text, n_gram_size);
+        let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
+        let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
 
+        println!("Computed T value: {}", t_value);
+    }
+
+    if matches.is_present("t3") {
+        let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
+        let probabilities = read_probabilities(probabilities_file)?;
+        let n_gram_size: u32= 3;
+        let n_gram_counts = count_ngrams(&text, n_gram_size);
+        let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
+        let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
+
+        println!("Computed T value: {}", t_value);
+    }
+    if matches.is_present("t4") {
+        let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
+        let probabilities = read_probabilities(probabilities_file)?;
+        let n_gram_size: u32= 4;
+        let n_gram_counts = count_ngrams(&text, n_gram_size);
+        let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
+        let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
+
+        println!("Computed T value: {}", t_value);
+    }
     Ok(())
 }

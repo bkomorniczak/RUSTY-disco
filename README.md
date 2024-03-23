@@ -1,8 +1,6 @@
 # Opis projektu
 ## Komendy
 
-
-
 ### Szyfruj
 ```
 cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt
@@ -40,23 +38,22 @@ cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/reso
 cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt --ri src/resource/monogram.txt --ro src/resource/monogram_probabilities.txt
 ```
 ### Oblicz T dla wszystkich ngramow
-```
 
 #### Monogramy
 ```
-cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/monogram_probabilities.txt --t
+cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/monogram_probabilities.txt --t1
 ```
 #### Bigramy
 ```
-cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/bigram_probabilities.txt --t
+cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/bigram_probabilities.txt --t2
 ```
 #### Trigramy
 ```
-cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/trigram_probabilities.txt --t
+cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/trigram_probabilities.txt --t3
 ```
 #### Quadgramy
 ```
-cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/quadgram_probabilities.txt --t
+cargo run -- -i src/resource/plain.txt -o src/resource/encrypted.txt -k src/resource/dictionary.txt  --p src/resource/quadgram_probabilities.txt --t4
 ```
 
 
