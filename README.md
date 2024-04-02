@@ -1,6 +1,6 @@
 # Opis projektu
 
-## Glówne funkcje programu
+## Główne funkcje programu
 Program pozwala na:
 - szyfrowanie i deszyfrowanie tekstu przy użyciu szyfru podstawieniowego,
 - obliczenie monogramów, bigramów, trigramów, quadgramów oraz prawdopodobieństw ich wystąpienia w tekście,
@@ -45,7 +45,7 @@ Funkcja zwraca wynik operacji w postaci Result<()>.
 W przypadku wystąpienia błędu zwraca komunikat o jego wystąpieniu, w przeciwnym wypadku komunikat informujący o sukcesie.
 Żeby zaszyfrować tekst, wywoływana jest funkcja encrypt_file z modułu encrypt. 
 Szyfrowanie pliku zostało zaimplementowane w osobnym module dla lepszej czytelności kodu. Znajdują się tam funkcje:
-- encrypt_file - funkcja odpowiadająca za szyfrowanie pliku
+### encrypt_file - funkcja odpowiadająca za szyfrowanie pliku
 ```rust
 pub fn encrypt_file(plain_path: &str, encrypted_path: &str, dictionary_path: &str) -> io::Result<()> {
 let dictionary_map = read_dictionary_to_map(dictionary_path)?;
@@ -73,8 +73,7 @@ Tekst wejściowy jest filtrowany, aby usunąć znaki inne niż litery.
 Następnie tekst jest zamieniany na duże litery. 
 Dla każdej litery z tekstu wejściowego, jeśli litera znajduje się w słowniku, to litera jest zamieniana na zaszyfrowaną literę. 
 W przeciwnym wypadku litera jest pozostawiana bez zmian. Zaszyfrowany tekst jest zapisywany do pliku.
-- read_dictionary_to_map - funkcja odpowiadająca za wczytanie słownika do mapy
-
+### read_dictionary_to_map - funkcja odpowiadająca za wczytanie słownika do mapy
 ```rust
 pub fn read_dictionary_to_map(dictionary_path: &str) -> io::Result<HashMap<char, char>> {
   let mut map = HashMap::new();
@@ -93,12 +92,10 @@ pub fn read_dictionary_to_map(dictionary_path: &str) -> io::Result<HashMap<char,
   }
 ```
 W tej funkcji najpierw inicjalizowana jest pusta HashMapa - do niej będą zapisywane pary <litera_do_zaszyfrowania, litera_klucza>.
-Zeby to osiagnac najpierw iterujemy po wczytanej z pliku zawartosci. Każda linia jest dzielona na dwie czesci po " ".
-Wynik zapisywany jest do wektora parts. Nastepnie iterujemy po tym wektorze (pod warunkiem, że każda czesc ma dlugosc 2 - czyli, ze kazdej literze 
-"do zaszyfrowania" odpowiada element klucza). Potem ta dwojka jest rozpakowywana z Optional<char> i zapisywana do mapy. 
-
-Pozostałe funkcje w projekcie:
-- count_ngrams - funkcja odpowiadająca za zliczanie ngramów
+Żeby to osiągnąć najpierw iterujemy po wczytanej z pliku zawartości. Każda linia jest dzielona na dwie cześci po " ".
+Wynik zapisywany jest do wektora parts. Następnie iterujemy po tym wektorze (pod warunkiem, że każda czesc ma dlugość 2 - czyli, ze każdej literze 
+"do zaszyfrowania" odpowiada element klucza). Potem ta dwójka jest rozpakowywana z Optional<char> i zapisywana do mapy. 
+### count_ngrams - funkcja odpowiadająca za zliczanie ngramów
 ```rust
 fn count_ngrams(text: &str, n: u32) -> Vec<(String, u32)> {
     let mut counts = HashMap::new();
@@ -125,7 +122,10 @@ i zliczam występowanie ngramu.
 Ta linijka sprawdza czy w Hashmapie jest juz szukany przez nas ngram, jesli tak inkrementuje ilosc jego wystapien, jesli nie,
 najpierw zapisuje go do hashmapy z iloscia wystapien 0, a potem inkrementuje tą wartość. 
 na koniec sortuje wynikowy wektor, żeby łatwiej móc odczytać ilość wystąpień poszczególnych ngramow.
-Zwraca bardzo niejavowy wektor tupli - ngram i ilosc jego powtorzen.
+Zwraca bardzo niejavowy wektor tupli - ngram i ilosc jego powtorzeń.
+
+
+Pozostałe funkcje w projekcie:
 - save_ngrams - funkcja odpowiadająca za zapisywanie ngramów do pliku
 - sum_values_in_file - funkcja odpowiadająca za zliczanie wszystkich ngramow w pliku
 - calculate_and_save_ngram_probabilities - funkcja odpowiadająca za obliczanie i zapisywanie do pliku prawdopodobieństw ngramów
