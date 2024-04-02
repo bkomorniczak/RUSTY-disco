@@ -1,16 +1,12 @@
 use std::{fs, io};
 use std::collections::HashMap;
 
-// fn read_plain_text(file_path: &str) -> io::Result<String> {
-//     fs::read_to_string(file_path)
-// }
-
 pub fn read_dictionary_to_map(dictionary_path: &str) -> io::Result<HashMap<char, char>> {
     let mut map = HashMap::new();
     let content = fs::read_to_string(dictionary_path)?;
 
     for line in content.lines() {
-        let parts: Vec<&str> = line.split('\t').collect();
+        let parts: Vec<&str> = line.split(' ').collect();
         if parts.len() == 2 {
             let (plain, encrypted) = (parts[0].chars().next(), parts[1].chars().next());
             if let (Some(p), Some(e)) = (plain, encrypted) {
