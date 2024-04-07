@@ -234,46 +234,5 @@ fn main() -> io::Result<()> {
             println!("Computed T value for {}-grams: {}", n, t_value);
         }
     }
-    // if matches.is_present("t1") {
-    //     let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
-    //     let probabilities = read_probabilities(probabilities_file)?;
-    //     let n_gram_size: u32= 1;
-    //     let n_gram_counts = count_ngrams(&text, n_gram_size);
-    //     let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
-    //     let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
-    //
-    //     println!("Computed T value: {}", t_value);
-    // }
-    // if matches.is_present("t2") {
-    //     let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
-    //     let probabilities = read_probabilities(probabilities_file)?;
-    //     let n_gram_size: u32= 2;
-    //     let n_gram_counts = count_ngrams(&text, n_gram_size);
-    //     let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
-    //     let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
-    //
-    //     println!("Computed T value: {}", t_value);
-    // }
-    //
-    // if matches.is_present("t3") {
-    //     let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
-    //     let probabilities = read_probabilities(probabilities_file)?;
-    //     let n_gram_size: u32= 3;
-    //     let n_gram_counts = count_ngrams(&text, n_gram_size);
-    //     let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
-    //     let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
-    //
-    //     println!("Computed T value: {}", t_value);
-    // }
-    // if matches.is_present("t4") {
-    //     let probabilities_file = matches.value_of("probabilities").expect("Probabilities file is required");
-    //     let probabilities = read_probabilities(probabilities_file)?;
-    //     let n_gram_size: u32= 4;
-    //     let n_gram_counts = count_ngrams(&text, n_gram_size);
-    //     let total_ngrams = n_gram_counts.iter().map(|(_, count)| *count).sum::<u32>();
-    //     let t_value = calculate_t(&n_gram_counts.into_iter().collect::<HashMap<_, _>>(), total_ngrams, &probabilities);
-    //
-    //     println!("Computed T value: {}", t_value);
-    // }
     Ok(())
 }

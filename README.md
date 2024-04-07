@@ -116,7 +116,7 @@ fn count_ngrams(text: &str, n: u32) -> Vec<(String, u32)> {
 Funkcja przyjmuje dwa argumenty - test do analizy i wielkosc ngramu. Najpierw tekst jest przefiltrowywany - usuwane są z
 niego wszyskie znaki nie będące literami. Następnie używając kolejnej niejawowej struktury danych - window - iteruję po tekście
 i zliczam występowanie ngramu. 
-```rust
+```
         *counts.entry(ngram).or_insert(0) += 1;
 ```
 Ta linijka sprawdza czy w Hashmapie jest juz szukany przez nas ngram, jesli tak inkrementuje ilosc jego wystapien, jesli nie,
