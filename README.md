@@ -1,4 +1,5 @@
-# Opis projektu
+# LABORATORIUM NR 1
+## BARBARA KOMORNICZAK, GRZEGORZ KARKOWSKI
 
 ## Główne funkcje programu
 Program pozwala na:

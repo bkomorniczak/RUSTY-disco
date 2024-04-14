@@ -1,9 +1,10 @@
- use rand::Rng;
- use std::fs::File;
- use std::io;
- use std::io::Write;
+use std::collections::HashSet;
+use rand::Rng;
+use std::fs::File;
+use std::io;
+use std::io::Write;
 
-fn generate_key_map() -> io::Result<()> {
+pub fn generate_key_map() -> io::Result<()> {
     let mut file = File::create(DICTIONARY_PATH)?;
     let mut used_keys = HashSet::new();
     let mut rng = rand::thread_rng();
@@ -20,4 +21,4 @@ fn generate_key_map() -> io::Result<()> {
     Ok(())
 }
 
- const DICTIONARY_PATH: &'static str = "src/resource/dictionary.txt";
+const DICTIONARY_PATH: &'static str = "src/resource/dictionary.txt";
